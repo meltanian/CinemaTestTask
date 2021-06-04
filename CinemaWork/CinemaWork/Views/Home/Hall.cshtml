@@ -1,0 +1,24 @@
+﻿@model Tuple<CinemaWork.ModelsDB.CinemaHall, List<CinemaWork.ModelsDB.CinemaSession>>;
+@{ 
+    var hall = Model.Item1;
+    var sessions = Model.Item2;
+}
+<div class="container text-center m-3 h-75 h3">
+    <div class="modal-title">Sessions in <b>@hall.HallName</b> </div>
+</div>
+<div class="container text-left">
+    @foreach (var session in sessions)
+    {
+        <div class="card text-white bg-dark d-block mt-1 mb-2 p-2 rounded" style="border-width:2px; border-color:gainsboro">
+            <div class="card-title d-inline p-1">Session IN:</div>
+            <div class="text-left d-inline p-1">DATE: @session.Date.ToString("MM-dd-yytt")</div>
+            <div class="text-left d-inline p-1">TIME: @(session.Time.Hours.ToString() + ":" + @session.Time.Minutes.ToString())</div>
+            <form method="post" action="@Url.Action("OpenSession", "Home")" class="text-center d-inline">
+                <div class="form-group m-2 text-center d-inline">
+                    <input type="hidden" value="@session.ID" name="sessionID" />
+                    <button id="btn_@session.ID" type="submit" class="btn btn-primary">Go To Session</button>
+                </div>
+            </form>
+        </div>
+    }
+</div>

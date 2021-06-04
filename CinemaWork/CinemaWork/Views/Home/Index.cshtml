@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container w-100">
+    <div class="container">
+        <div class="h3 d-block text-center mt-2 text-info">Select Hall</div>
+    </div>
+    <div class="container-fluid text-center p-1">
+        @foreach (var item in CinemaWork.DBWoker.DBWoker.GetHallsByCinemaID(Globals.SelectedCinema.ID))
+        {
+            <div class="card bg-dark d-inline-block m-1 mt-2 p-1" style="width: 19rem">
+                <div class="card-body">
+                    <div class="card-title text-center h5 bg-primary rounded p-2 text-white w-100">@item.HallName</div>
+                    <div class="card-subtitle text-center text-white p-1 m-1">Hall Number: @item.HallNumber</div>
+                    <form method="post" action="@Url.Action("OpenHall", "Home")" class="text-center">
+                        <div class="form-group m-2 text-center">
+                            <input type="hidden" value="@item.ID" name="hallId" />
+                            <button id="btn_@item.ID" type="submit" class="btn btn-primary w-100">Go To Hall</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>

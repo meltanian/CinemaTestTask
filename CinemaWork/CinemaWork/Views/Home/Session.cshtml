@@ -1,0 +1,59 @@
+﻿@model Tuple<CinemaWork.ModelsDB.CinemaSession, CinemaWork.ModelsDB.CinemaHall, List<CinemaWork.ModelsDB.CinemaPlaces>>;
+@{ 
+    var hall = Model.Item2;
+    var session = Model.Item1;
+    var places = Model.Item3;
+    var rows = places.Max(a => a.Row);
+    var booked = CinemaWork.DBWoker.DBWoker.GetBookedBySEssionID(session.ID);
+    var bookedId = booked.Where(a => a.Booked).Select(a => a.PlaceID);
+}
+
+<div class="container text-center m-3">
+    <div class="modal-title h4">Sessions in <b>@hall.HallName</b> Hall </div>
+    <div class="modal-title h5">DATE: @session.Date.ToString("yyyy-MM-dd") TIME: @(session.Time.Hours.ToString() + ":" + session.Time.Minutes.ToString()) </div>
+</div>
+<form class="container container-fluid text-center m-2" method="post" action="@Url.Action("BookPlace")">
+    <input id="placeFormHall" type="hidden" name="hallId" value="@hall.ID" />
+    <input id="placeFormSession" type="hidden" name="sessionId" value="@session.ID" />
+    <input id="placeFormPlaceIdBook" type="hidden" name="placeIdBook" value="" />
+    <input id="placeFormPlaceIdRelease" type="hidden" name="placeIdRelease" value="" />
+    <input id="placeFormSubmit" type="submit" style="display:none" />
+    @for (int i = 1; i <= rows; i++)
+    {
+        <div class="container">
+            <div class="container d-inline-block mb-0 p-0">
+                <div class="rounded-circle d-inline-block text-left m-0 p-0" style="height:25px;width:35px;vertical-align:middle;line-height:7px">
+                    <span class="m-auto"><b>@i</b></span>
+                </div>
+                @{ var placeRow = places.Where(a => a.Row == i).OrderBy(a => a.Col).ToList(); }
+                @for (int c = 0; c < placeRow.Count(); c++)
+                {
+                    bool isBook = bookedId.Contains(placeRow[c].ID);
+                    var place = placeRow[c];
+                    <div name="placeID" class="d-inline-block rounded-circle"
+                         data-placeId="@place.ID" data-row="@place.Row" data-col="@place.Col"
+                         style="width:25px;height:25px;background-color:@(isBook ? "gray" : "green");cursor:pointer"
+                         onclick="@(isBook ? "ReleasePlace(this)" : "BookPlace(this)"); return false;"></div>
+                }
+            </div>
+        </div>
+    }
+</form>
+
+<script>
+    function BookPlace(elem)
+    {
+        var dataId = $(elem).attr('data-placeId');
+        //
+        $('#placeFormPlaceIdBook').val(dataId);
+        $('#placeFormSubmit').click();
+    }
+
+    function ReleasePlace(elem)
+    {
+        var dataId = $(elem).attr('data-placeId');
+        //
+        $('#placeFormPlaceIdRelease').val(dataId);
+        $('#placeFormSubmit').click();
+    }
+</script>
